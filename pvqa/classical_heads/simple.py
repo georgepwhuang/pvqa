@@ -9,11 +9,10 @@ from torch.nn import functional as F
 from pvqa.metrics import MulticlassClassificationMetrics, BinaryClassificationMetrics
 
 
-class FeedForwardClassifier(pl.LightningModule):
-    def __init__(self, input_dim: int, hidden_dim: int, labels: Union[List[str], int], learning_rate: float):
+class SimpleClassifier(pl.LightningModule):
+    def __init__(self, input_dim: int, labels: Union[List[str], int], learning_rate: float):
         super().__init__()
         self.input_dim = input_dim
-        self.hidden_dim = hidden_dim
         if isinstance(labels, int):
             self.num_classes = labels
             self.labels = list(map(lambda x: str(x), range(labels)))
@@ -27,9 +26,7 @@ class FeedForwardClassifier(pl.LightningModule):
         self.task = "binary" if self.num_classes == 1 else "multiclass"
 
         self.model = nn.Sequential(
-            nn.Linear(self.input_dim, self.hidden_dim),
-            nn.ReLU(),
-            nn.Linear(self.hidden_dim, self.num_classes))
+            nn.Linear(self.input_dim, self.num_classes))
 
         if self.task == "multiclass":
             self.val_metrics = MulticlassClassificationMetrics(self.num_classes, "val", self.labels)

@@ -1,0 +1,11 @@
+torch~=1.13.1
+torchvision~=0.14.1
+seaborn~=0.12.2
+matplotlib~=3.7.0
+torchmetrics~=0.11.1
+PennyLane~=0.28.0
+numpy~=1.23.5
+scikit-learn~=1.2.1
+tqdm~=4.64.1
+tensorboard~=2.12.0
+rich~=13.3.1
