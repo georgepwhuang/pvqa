@@ -11,8 +11,7 @@ from tqdm import TqdmExperimentalWarning
 
 from pvqa.classical_heads.simple import SimpleClassifier
 from pvqa.constants import *
-from pvqa.data_process import convert_to_post_variational
-from pvqa.data_process.mnist_processing import convert_mnist_data
+from pvqa.data_process import convert_to_post_variational, convert_mnist_data
 
 warnings.filterwarnings("ignore", category=UserWarning)
 warnings.filterwarnings("ignore", category=TqdmExperimentalWarning)
