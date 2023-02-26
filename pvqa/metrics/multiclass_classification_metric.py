@@ -33,7 +33,7 @@ class MulticlassClassificationMetrics(nn.Module):
     def forward(self, x, y):
         for metric in self.scalars.values():
             metric(x, y)
-        stat_scores = tm.functional.classification.stat_scores(x, y, num_classes=self.num_classes, average="macro",
+        stat_scores = tm.functional.classification.stat_scores(x, y, num_classes=self.num_classes, average="none",
                                                                task="multiclass")
         self.cnfs_mat(x, y)
         self.class_report.update(stat_scores)
