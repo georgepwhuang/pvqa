@@ -9,7 +9,7 @@ from torch.utils.data import random_split, DataLoader
 from torchvision import datasets
 from tqdm import TqdmExperimentalWarning
 
-from pvqa.classical_heads.simple import SimpleClassifier
+from pvqa.classical_heads import SimpleClassifier
 from pvqa.constants import *
 from pvqa.data_process import convert_to_post_variational, convert_mnist_data
 

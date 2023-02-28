@@ -1,1 +1,1 @@
-from pvqa.qencoders.post_variational_encoder import *
+from pvqa.qencoders.bottom_up_encoders import *
