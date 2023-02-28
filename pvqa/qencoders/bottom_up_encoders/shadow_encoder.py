@@ -29,7 +29,7 @@ class PyTorchShadowPostVariationalEncoder:
 
         self.recipe, self.random_measurement_basis = self.__generate_observables()
 
-        self.model = qml.QNode(self.qnode, self.device, interface="torch")
+        self.model = qml.QNode(self.qnode, self.device, interface="torch", cache=False)
 
     def __generate_observables(self):
         np.random.seed(self.seed)
@@ -43,9 +43,6 @@ class PyTorchShadowPostVariationalEncoder:
                                       for measurement in self.random_measurement_basis]))
 
     def __call__(self, inputs, *args, **kwargs):
-        torch_device = inputs.device
-        if self.recipe.device != torch_device:
-            self.recipe = self.recipe.to(torch_device)
         bits = self.model(inputs, *args, **kwargs)
         bits = bits.reshape([self.measurements, self.n_qubits, -1])
         bits = bits.permute((2, 0, 1))
@@ -53,10 +50,11 @@ class PyTorchShadowPostVariationalEncoder:
         for observable in self.observable_list:
             p_str = pauli_word_to_string(observable, wire_map={i: i for i in range(self.n_qubits)})
             p_str = [*p_str]
-            obs = torch.tensor(list(map(lambda x: ord(x) - ord('X'), p_str)), device=torch_device)
+            obs = torch.tensor(list(map(lambda x: ord(x) - ord('X'), p_str)))
             bitmask = (self.recipe == obs)
             result = bits * bitmask
-            result[result == 0] = 1
+            ones = torch.ones(self.measurements, self.n_qubits)
+            result = torch.where(result != 0, result, ones)
             hits_bitmask = bitmask.sum(dim=1) > 0
             result = result.prod(dim=2)
             result = torch.sum(result * hits_bitmask, dim=1)/torch.clamp(torch.sum(hits_bitmask), min=1)

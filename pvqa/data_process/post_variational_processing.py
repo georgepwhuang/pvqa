@@ -28,7 +28,7 @@ def convert_to_post_variational(data: Dataset,
     labels = []
     for x, y in tqdm(iter(dataloader), desc="Converting to Post Variational Quantum Embeddings"):
         x_mod = encoder(x)
-        inputs.append(x_mod)
+        inputs.append(x_mod.float())
         labels.append(y.long())
     inputs = torch.cat(inputs)
     labels = torch.cat(labels)

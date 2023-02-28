@@ -26,21 +26,17 @@ train_batch_size = 128
 
 observable_list = list(local_pauli_group(n_qubits, 3))
 
-torch_device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-
 labels = list(map(lambda x: str(x), range(10)))
 
 kmnist_train_dataset = datasets.MNIST(root=DATA_DIR, train=True, download=True)
 kmnist_test_dataset = datasets.MNIST(root=DATA_DIR, train=False, download=True)
 pca_train_dataset, pca_test_dataset = convert_mnist_data(kmnist_train_dataset, kmnist_test_dataset, q_dim)
-pca_train_dataset = pca_train_dataset.to(torch_device)
-pca_test_dataset = pca_test_dataset.to(torch_device)
 pvq_dataset = convert_to_post_variational(pca_train_dataset, n_qubits, observable_list, qml.AmplitudeEmbedding,
                                           embedding_kwargs={"normalize": True}, processing_batch_size=qnode_batch_size,
-                                          shadow=True, shots=100)
+                                          shadow=True, shots=1000)
 test_dataset = convert_to_post_variational(pca_test_dataset, n_qubits, observable_list, qml.AmplitudeEmbedding,
                                            embedding_kwargs={"normalize": True}, processing_batch_size=qnode_batch_size,
-                                           shadow=True, shots=100)
+                                           shadow=True, shots=1000)
 val_len = int(len(pvq_dataset) / 10)
 train_dataset, val_dataset = random_split(pvq_dataset, [len(pvq_dataset) - val_len, val_len])
 

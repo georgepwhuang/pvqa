@@ -18,7 +18,7 @@ class PyTorchPostVariationalEncoder:
         self.embedding = embedding
         self.embedding_kwargs = dict() if embedding_kwargs is None else embedding_kwargs
 
-        self.model = qml.QNode(self.qnode, self.device, interface="torch")
+        self.model = qml.QNode(self.qnode, self.device, interface="torch", cache=False)
 
     def qnode(self, inputs):
         self.embedding(features=inputs, wires=range(self.n_qubits), **self.embedding_kwargs)
