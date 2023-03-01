@@ -4,7 +4,7 @@ import pennylane as qml
 import torch
 
 
-class PyTorchPostVariationalEncoder:
+class PyTorchBottomUpEncoder:
     def __init__(self,
                  n_qubits: int,
                  observable_list: Iterable[qml.operation.Observable],
@@ -29,5 +29,5 @@ class PyTorchPostVariationalEncoder:
 
 
 if __name__ == "__main__":
-    model = PyTorchPostVariationalEncoder(2, qml.pauli.pauli_group(2), embedding=qml.AngleEmbedding)
+    model = PyTorchBottomUpEncoder(2, qml.pauli.pauli_group(2), embedding=qml.AngleEmbedding)
     output = model(torch.tensor([[2, 3], [4, 5], [6, 7]]).double())

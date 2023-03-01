@@ -5,7 +5,7 @@ import torch
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 from tqdm.rich import tqdm
 
-from pvqa.qencoders import PyTorchPostVariationalEncoder, PyTorchShadowPostVariationalEncoder
+from pvqa.qencoders import PyTorchBottomUpEncoder, PyTorchShadowBottomUpEncoder
 
 
 def convert_to_post_variational(data: Dataset,
@@ -18,11 +18,11 @@ def convert_to_post_variational(data: Dataset,
                                 shots: Optional[int] = None,
                                 processing_batch_size: int = 16):
     if shadow:
-        encoder = PyTorchShadowPostVariationalEncoder(n_qubits, observable_list, embedding, embedding_kwargs, device,
+        encoder = PyTorchShadowBottomUpEncoder(n_qubits, observable_list, embedding, embedding_kwargs, device,
                                                       shots)
     else:
-        encoder = PyTorchPostVariationalEncoder(n_qubits, observable_list, embedding, embedding_kwargs,
-                                                device, shots)
+        encoder = PyTorchBottomUpEncoder(n_qubits, observable_list, embedding, embedding_kwargs,
+                                         device, shots)
     dataloader = DataLoader(data, batch_size=processing_batch_size)
     inputs = []
     labels = []
