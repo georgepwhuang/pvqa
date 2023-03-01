@@ -1,10 +1,8 @@
-import itertools
 from typing import Iterable, Optional
 
 import numpy as np
 import pennylane as qml
 import torch
-from pennylane import PauliX, PauliY, PauliZ
 from pennylane.pauli import pauli_word_to_string, string_to_pauli_word
 
 from pvqa.util import local_pauli_group
