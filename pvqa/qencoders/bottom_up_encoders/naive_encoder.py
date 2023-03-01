@@ -24,8 +24,8 @@ class PyTorchBottomUpEncoder:
         self.embedding(features=inputs, wires=range(self.n_qubits), **self.embedding_kwargs)
         return [qml.expval(observable) for observable in self.observable_list]
 
-    def __call__(self, *args, **kwargs):
-        return self.model(*args, **kwargs).reshape([len(self.observable_list), -1]).transpose(0, 1)
+    def __call__(self, inputs):
+        return self.model(inputs).reshape([len(self.observable_list), -1]).transpose(0, 1)
 
 
 if __name__ == "__main__":

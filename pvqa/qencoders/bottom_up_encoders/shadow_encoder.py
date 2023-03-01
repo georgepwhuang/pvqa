@@ -54,7 +54,7 @@ class PyTorchShadowBottomUpEncoder:
         self.embedding(features=inputs, wires=range(self.n_qubits), **self.embedding_kwargs)
         return qml.counts()
 
-    def __call__(self, inputs, *args, **kwargs):
+    def __call__(self, inputs):
         torch_device = inputs.device
         if self.recipe.device != torch_device:
             self.recipe = self.recipe.to(torch_device)

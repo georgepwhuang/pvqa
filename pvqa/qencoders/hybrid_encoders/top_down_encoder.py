@@ -4,6 +4,7 @@ import numpy as np
 import pennylane as qml
 from pennylane import numpy as qnp
 from pennylane.pauli import group_observables
+from functools import partial
 
 
 class TopDownEncoder:
@@ -28,8 +29,9 @@ class TopDownEncoder:
         
         self.grouped_observables = group_observables(self.observable_list)
 
-        self.model = qml.QNode(self.qnode, self.device, diff_method="parameter-shift", max_diff=self.derivative_order)
-
+        self.models = [qml.QNode(partial(self.qnode, observables=observable_group), self.device, diff_method="parameter-shift", 
+                                 max_diff=self.derivative_order) for observable_group in self.grouped_observables]
+        
     def qnode(self, features, weights, observables):
         self.embedding(features=features, wires=range(self.n_qubits), **self.embedding_kwargs)
         self.ansatz(weights=weights, wires=range(self.n_qubits), **self.ansatz_kwargs)
@@ -37,12 +39,12 @@ class TopDownEncoder:
 
     def __call__(self, features, weights):
         results = []
-        for observable_group in self.grouped_observables:
-            group_results = [self.model(features, weights, observable_group).reshape((len(observable_group), features.shape[0], -1))]
-            func = self.model
+        for model, observable_group in zip(self.models, self.grouped_observables):
+            group_results = [model(features, weights).reshape((len(observable_group), features.shape[0], -1))]
+            func = model
             for _ in range(self.derivative_order):
                 func = qml.jacobian(func, argnum=1)
-                group_results.append(func(features, weights, observable_group).reshape((len(observable_group), features.shape[0], -1)))
+                group_results.append(func(features, weights).reshape((len(observable_group), features.shape[0], -1)))
             group_results = np.concatenate(group_results, axis=-1)
             group_results = group_results.transpose((1, 0, 2))
             results.append(group_results)
@@ -55,3 +57,4 @@ if __name__ == "__main__":
     model = TopDownEncoder(2, qml.pauli.pauli_group(2), embedding=qml.AngleEmbedding,
                            ansatz=qml.StronglyEntanglingLayers, derivative_order=2)
     output = model(qnp.tensor([[2, 3], [4, 5], [6, 7]]), qnp.random.rand(1, 2, 3))
+    output2 = model(qnp.tensor([[3, 4], [4, 5], [5, 6]]), qnp.random.rand(1, 2, 3))
