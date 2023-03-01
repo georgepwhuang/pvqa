@@ -57,4 +57,3 @@ if __name__ == "__main__":
     model = TopDownEncoder(2, qml.pauli.pauli_group(2), embedding=qml.AngleEmbedding,
                            ansatz=qml.StronglyEntanglingLayers, derivative_order=2)
     output = model(qnp.tensor([[2, 3], [4, 5], [6, 7]]), qnp.random.rand(1, 2, 3))
-    output2 = model(qnp.tensor([[3, 4], [4, 5], [5, 6]]), qnp.random.rand(1, 2, 3))
