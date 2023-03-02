@@ -40,7 +40,7 @@ class TopDownEncoder:
     def __call__(self, features, weights):
         results = []
         for model, observable_group in zip(self.models, self.grouped_observables):
-            group_results = [model(features, weights).reshape((len(observable_group), features.shape[0], -1))]
+            group_results = [qnp.expand_dims(model(features, weights), -1)]
             func = model
             for _ in range(self.derivative_order):
                 func = qml.jacobian(func, argnum=1)

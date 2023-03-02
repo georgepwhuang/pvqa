@@ -1,10 +1,10 @@
 from typing import Iterable, Optional
 
 import pennylane as qml
-import torch
+from pennylane import numpy as qnp
 
 
-class PyTorchBottomUpEncoder:
+class BottomUpEncoder:
     def __init__(self,
                  n_qubits: int,
                  observable_list: Iterable[qml.operation.Observable],
@@ -18,16 +18,17 @@ class PyTorchBottomUpEncoder:
         self.embedding = embedding
         self.embedding_kwargs = dict() if embedding_kwargs is None else embedding_kwargs
 
-        self.model = qml.QNode(self.qnode, self.device, interface="torch", cache=False)
+        self.model = qml.QNode(self.qnode, self.device, cache=False)
 
     def qnode(self, features):
         self.embedding(features=features, wires=range(self.n_qubits), **self.embedding_kwargs)
         return [qml.expval(observable) for observable in self.observable_list]
 
     def __call__(self, features):
-        return self.model(features).reshape([len(self.observable_list), -1]).transpose(0, 1)
+        return self.model(features)
 
 
 if __name__ == "__main__":
-    model = PyTorchBottomUpEncoder(2, qml.pauli.pauli_group(2), embedding=qml.AngleEmbedding)
-    output = model(torch.tensor([[2, 3], [4, 5], [6, 7]]).double())
+    model = BottomUpEncoder(2, qml.pauli.pauli_group(2), embedding=qml.AngleEmbedding)
+    output = model(qnp.tensor([[2,3],[4,5]]))
+    print(output)

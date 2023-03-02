@@ -1,2 +1,2 @@
-from pvqa.qencoders.bottom_up_encoders.naive_encoder import *
-from pvqa.qencoders.bottom_up_encoders.shadow_encoder import *
+from pvqa.qencoders.bottom_up_encoders.torch_naive_encoder import *
+from pvqa.qencoders.bottom_up_encoders.torch_shadow_encoder import *
