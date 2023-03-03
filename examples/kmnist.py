@@ -25,10 +25,12 @@ labels = [u"\u304a", u"\u304d", u"\u3059", u"\u3064", u"\u306a", u"\u306f", u"\u
 kmnist_train_dataset = datasets.KMNIST(root=DATA_DIR, train=True, download=True)
 kmnist_test_dataset = datasets.KMNIST(root=DATA_DIR, train=False, download=True)
 pca_train_dataset, pca_test_dataset = convert_mnist_data(kmnist_train_dataset, kmnist_test_dataset, 16)
-pvq_dataset = convert_to_post_variational(pca_train_dataset, 4, observable_list, qml.AmplitudeEmbedding,
-                                          embedding_kwargs={"normalize": True}, processing_batch_size=512)
-test_dataset = convert_to_post_variational(pca_test_dataset, 4, observable_list, qml.AmplitudeEmbedding,
-                                           embedding_kwargs={"normalize": True}, processing_batch_size=512)
+pvq_dataset, test_dataset, output_dim = convert_to_post_variational(4, observable_list, qml.AmplitudeEmbedding,
+                                                                    train_data=pca_train_dataset,
+                                                                    test_data=pca_test_dataset,
+                                                                    embedding_kwargs={"normalize": True},
+                                                                    processing_batch_size=128,
+                                                                    shadow_strategy="qwc")
 val_len = int(len(pvq_dataset) / 10)
 train_dataset, val_dataset = random_split(pvq_dataset, [len(pvq_dataset) - val_len, val_len])
 

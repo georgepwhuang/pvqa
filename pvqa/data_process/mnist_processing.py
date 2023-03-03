@@ -32,5 +32,5 @@ def convert_mnist_data(train_dataset: MNIST, test_dataset: Optional[MNIST] = Non
     return TensorDataset(data_transform_normalized, labels)
 
 if __name__ == "__main__":
-    train_dataset = datasets.KMNIST(root=DATA_DIR, train=True, download=True)
-    output = convert_mnist_data(train_dataset, output_dim=8)
+    dataset = datasets.KMNIST(root=DATA_DIR, train=True, download=True)
+    output = convert_mnist_data(dataset, output_dim=8)
