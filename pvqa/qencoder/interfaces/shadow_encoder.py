@@ -5,11 +5,11 @@ import numpy as np
 import pennylane as qml
 from pennylane.pauli import pauli_word_to_string, string_to_pauli_word, group_observables
 
-from pvqa.qencoders.interfaces.qencoder import QEncoder
+from pvqa.qencoder.interfaces.qencoder import QEncoder
 
 
 class ShadowEncoder(QEncoder, ABC):
-    def __init__(self, n_qubits: int, observable_list: Iterable[qml.operation.Observable], embedding: type,
+    def __init__(self, n_qubits: int, observable_list: Iterable[qml.operation.Observable], embedding: str,
                  embedding_kwargs: Optional[dict], device: str, shots: Optional[int], strategy: str,
                  seed: Optional[int], *args, **kwargs):
         super(ShadowEncoder, self).__init__(n_qubits, observable_list, embedding, embedding_kwargs, device, shots,

@@ -1,2 +1,4 @@
-from pvqa.metrics.binary_classification_metric import *
-from pvqa.metrics.multiclass_classification_metric import *
+from pvqa.metrics.base import ClassificationMetric
+from pvqa.metrics.binary_classification_metric import BinaryClassificationMetrics
+from pvqa.metrics.multiclass_classification_metric import MulticlassClassificationMetrics
+from pvqa.metrics.multilabel_classification_metric import MultilabelClassificationMetrics

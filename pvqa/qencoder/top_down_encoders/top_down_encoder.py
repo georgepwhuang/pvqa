@@ -5,12 +5,12 @@ import numpy as np
 import pennylane as qml
 from pennylane.pauli import group_observables
 
-from pvqa.qencoders.interfaces import TaylorEncoder
+from pvqa.qencoder.interfaces import TaylorEncoder
 
 
 class TopDownEncoder(TaylorEncoder):
     def __init__(self, n_qubits: int, observable_list: Iterable[qml.operation.Observable], derivative_order: int,
-                 embedding: type, ansatz: type, init_weight: Union[np.array, qml.numpy.tensor],
+                 embedding: str, ansatz: str, init_weight: Union[np.array, qml.numpy.tensor],
                  embedding_kwargs: Optional[dict] = None, ansatz_kwargs: Optional[dict] = None,
                  device: str = "default.qubit", shots: Optional[int] = None):
         super(TopDownEncoder, self).__init__(n_qubits, observable_list, derivative_order, embedding, ansatz,
@@ -45,10 +45,3 @@ class TopDownEncoder(TaylorEncoder):
         results = np.concatenate(results, axis=1)
         results = results.reshape((features.shape[0], -1))
         return results
-
-
-if __name__ == "__main__":
-    encoder = TopDownEncoder(2, qml.pauli.pauli_group(2), embedding=qml.AngleEmbedding,
-                             ansatz=qml.StronglyEntanglingLayers, derivative_order=1,
-                             init_weight=np.random.rand(1, 2, 3))
-    output = encoder(np.array([[2, 3], [4, 5], [6, 7]]))

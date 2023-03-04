@@ -5,12 +5,10 @@ from typing import Iterable, Optional
 import numpy as np
 import pennylane as qml
 
-from pvqa.qencoders.interfaces import ShadowEncoder
-from pvqa.util import local_pauli_group
-
+from pvqa.qencoder.interfaces import ShadowEncoder
 
 class ShadowBottomUpEncoder(ShadowEncoder):
-    def __init__(self, n_qubits: int, observable_list: Iterable[qml.operation.Observable], embedding: type,
+    def __init__(self, n_qubits: int, observable_list: Iterable[qml.operation.Observable], embedding: str,
                  embedding_kwargs: Optional[dict] = None, device: str = "default.qubit", shots: Optional[int] = None,
                  strategy: Optional[str] = "qwc", seed: Optional[int] = 42):
         super(ShadowBottomUpEncoder, self).__init__(n_qubits, observable_list, embedding, embedding_kwargs, device,
@@ -30,8 +28,3 @@ class ShadowBottomUpEncoder(ShadowEncoder):
                             axis=(1, 3)) / np.sum(self.hitmask, axis=1)
         result = np.nan_to_num(result, nan=1.0)
         return result
-
-
-if __name__ == "__main__":
-    encoder = ShadowBottomUpEncoder(4, local_pauli_group(4, 2), embedding=qml.AngleEmbedding)
-    output = encoder(np.array([[1, 2, 3, 4], [4, 3, 2, 1], [0, 0, 0, 0]]))

@@ -1,0 +1,2 @@
+from pvqa.qencoder.top_down_encoders.top_down_encoder import TopDownEncoder
+from pvqa.qencoder.top_down_encoders.top_down_shadow_encoder import ShadowTopDownEncoder

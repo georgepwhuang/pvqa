@@ -5,12 +5,12 @@ from typing import Iterable, Optional
 import numpy as np
 import pennylane as qml
 
-from pvqa.qencoders.interfaces import ShadowEncoder, TaylorEncoder
+from pvqa.qencoder.interfaces import ShadowEncoder, TaylorEncoder
 
 
 class ShadowTopDownEncoder(TaylorEncoder, ShadowEncoder):
     def __init__(self, n_qubits: int, observable_list: Iterable[qml.operation.Observable], derivative_order: int,
-                 embedding: type, ansatz: type, embedding_kwargs: Optional[dict] = None,
+                 embedding: str, ansatz: str, embedding_kwargs: Optional[dict] = None,
                  ansatz_kwargs: Optional[dict] = None, device: str = "default.qubit", shots: Optional[int] = None,
                  strategy: str = "qwc", seed: Optional[int] = 42):
         super(ShadowTopDownEncoder, self).__init__(n_qubits=n_qubits, observable_list=observable_list,
@@ -53,9 +53,3 @@ class ShadowTopDownEncoder(TaylorEncoder, ShadowEncoder):
         result = np.nan_to_num(result, nan=1.0)
         result = result.reshape((features.shape[0], -1))
         return result
-
-
-if __name__ == "__main__":
-    encoder = ShadowTopDownEncoder(2, qml.pauli.pauli_group(2), embedding=qml.AngleEmbedding,
-                                   ansatz=qml.StronglyEntanglingLayers, derivative_order=1)
-    output = encoder(np.array([[2, 3], [4, 5], [6, 7]]), np.random.rand(1, 2, 3))

@@ -2,9 +2,8 @@ import torch
 from torch import nn
 
 
-def classification_report(data_dict):
-    non_label_keys = ["accuracy", "macro avg", "weighted avg"]
-    y_type = "multiclass"
+def classification_report(data_dict, y_type):
+    non_label_keys = ["accuracy", "micro_avg", "macro avg", "weighted avg"]
     digits = 2
 
     target_names = [
@@ -22,10 +21,7 @@ def classification_report(data_dict):
 
     rows = zip(target_names, p, r, f1, s)
 
-    if y_type.startswith("multilabel"):
-        average_options = ("micro", "macro", "weighted", "samples")
-    else:
-        average_options = ("micro", "macro", "weighted")
+    average_options = ("micro", "macro", "weighted")
 
     name_width = max(len(cn) for cn in target_names)
     width = max(name_width, 20, digits)
@@ -60,11 +56,13 @@ def classification_report(data_dict):
 
 
 class ClassificationReport(nn.Module):
-    def __init__(self, num_classes, labels):
+    def __init__(self, num_classes, labels, multilabel=False):
         super().__init__()
         self.num_classes = num_classes
         self.labels = labels
-        self.register_buffer('metrics', torch.zeros([num_classes, 5], dtype=torch.int32))
+        self.multilabel = multilabel
+        self.register_buffer('metrics', torch.zeros(
+            [num_classes, 5], dtype=torch.int32))
 
     def update(self, stat_scores: torch.Tensor):
         self.metrics = self.metrics.add(stat_scores)
@@ -78,31 +76,53 @@ class ClassificationReport(nn.Module):
 
         support_sum = torch.sum(support)
 
-        accuracy = torch.div(torch.sum(tp), torch.sum(support))
+        if self.multilabel:
+            prcn_micro = torch.div(torch.sum(tp), torch.sum(
+                tp) + torch.sum(fp)).nan_to_num()
+            rcll_micro = torch.div(torch.sum(tp), torch.sum(
+                tp) + torch.sum(fn)).nan_to_num()
+            fone_micro = torch.div(
+                2 * prcn_micro * rcll_micro, prcn_micro + rcll_micro).nan_to_num()
+        else:
+            accuracy = torch.div(torch.sum(tp), torch.sum(support))
 
         prcn_categ = torch.div(tp, tp + fp).nan_to_num()
         rcll_categ = torch.div(tp, tp + fn).nan_to_num()
-        fone_categ = torch.div(2 * prcn_categ * rcll_categ, prcn_categ + rcll_categ).nan_to_num()
+        fone_categ = torch.div(2 * prcn_categ * rcll_categ,
+                               prcn_categ + rcll_categ).nan_to_num()
 
         prcn_macro = torch.mean(prcn_categ)
         rcll_macro = torch.mean(rcll_categ)
         fone_macro = torch.mean(fone_categ)
 
-        prcn_weigh = torch.div(torch.sum(prcn_categ * support), support_sum).nan_to_num()
-        rcll_weigh = torch.div(torch.sum(rcll_categ * support), support_sum).nan_to_num()
-        fone_weigh = torch.div(torch.sum(fone_categ * support), support_sum).nan_to_num()
+        prcn_weigh = torch.div(
+            torch.sum(prcn_categ * support), support_sum).nan_to_num()
+        rcll_weigh = torch.div(
+            torch.sum(rcll_categ * support), support_sum).nan_to_num()
+        fone_weigh = torch.div(
+            torch.sum(fone_categ * support), support_sum).nan_to_num()
 
         support = support.cpu().tolist()
-        accuracy = accuracy.cpu().tolist()
+
+        if self.multilabel:
+            prcn_micro = prcn_micro.cpu().tolist()
+            rcll_micro = rcll_micro.cpu().tolist()
+            fone_micro = fone_micro.cpu().tolist()
+        else:
+            accuracy = accuracy.cpu().tolist()
+
         prcn_categ = prcn_categ.cpu().tolist()
         rcll_categ = rcll_categ.cpu().tolist()
         fone_categ = fone_categ.cpu().tolist()
+
         prcn_macro = prcn_macro.cpu().tolist()
         rcll_macro = rcll_macro.cpu().tolist()
         fone_macro = fone_macro.cpu().tolist()
+
         prcn_weigh = prcn_weigh.cpu().tolist()
         rcll_weigh = rcll_weigh.cpu().tolist()
         fone_weigh = fone_weigh.cpu().tolist()
+
         support_sum = support_sum.cpu().tolist()
 
         output = {}
@@ -111,8 +131,14 @@ class ClassificationReport(nn.Module):
                              "recall": rcll_categ[i],
                              "f1-score": fone_categ[i],
                              "support": support[i]}
-        output["accuracy"] = {"f1-score": accuracy,
-                              "support": support_sum}
+        if self.multilabel:
+            output["micro avg"] = {"precision": prcn_micro,
+                                   "recall": rcll_micro,
+                                   "f1-score": fone_micro,
+                                   "support": support_sum}
+        else:
+            output["accuracy"] = {"f1-score": accuracy,
+                                  "support": support_sum}
         output["macro avg"] = {"precision": prcn_macro,
                                "recall": rcll_macro,
                                "f1-score": fone_macro,
@@ -121,9 +147,10 @@ class ClassificationReport(nn.Module):
                                   "recall": rcll_weigh,
                                   "f1-score": fone_weigh,
                                   "support": support_sum}
-
-        return classification_report(output)
+        y_type = "multilabel" if self.multilabel else "multiclass"
+        return classification_report(output, y_type)
 
     def reset(self):
         device = self.metrics.device
-        self.metrics = torch.zeros([self.num_classes, 5], dtype=torch.int32, device=device)
+        self.metrics = torch.zeros(
+            [self.num_classes, 5], dtype=torch.int32, device=device)
