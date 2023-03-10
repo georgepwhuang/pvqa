@@ -1,11 +1,10 @@
 seed_everything: 42
-n_qubits: 2
-qdim: 4
-locality: 2
+n_qubits: 8
+qdim: 256
+locality: 3
 qencoder:
-  class_path: pvqa.qencoder.BottomUpEncoder
+  class_path: pvqa.qencoder.ShadowBottomUpEncoder
   init_args:
-    n_qubits: 2
     embedding: AmplitudeEmbedding
     embedding_kwargs:
       normalize: true

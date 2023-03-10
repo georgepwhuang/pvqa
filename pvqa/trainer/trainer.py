@@ -19,6 +19,7 @@ class PVQACLI(LightningCLI):
         parser.link_arguments("n_qubits", "observables.qubits")
         parser.link_arguments("locality", "observables.locality")
         parser.link_arguments("qdim", "data.init_args.qdim")
+        parser.link_arguments("n_qubits", "qencoder.init_args.n_qubits")
         parser.link_arguments("observables", "qencoder.init_args.observable_list", apply_on="instantiate")
         parser.link_arguments("qencoder", "data.init_args.qencoder", apply_on="instantiate")
         parser.link_arguments("data.qencode_dim", "model.init_args.input_dim", apply_on="instantiate")
