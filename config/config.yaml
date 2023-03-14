@@ -2,6 +2,7 @@ seed_everything: 42
 n_qubits: 8
 qdim: 256
 locality: 3
+kfold: 5
 qencoder:
   class_path: pvqa.qencoder.ShadowBottomUpEncoder
   init_args:

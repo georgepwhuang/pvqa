@@ -32,14 +32,14 @@ class TorchVisionDataModule(pl.LightningDataModule):
             test_dataset = dataset_class(root=DATA_DIR, train=False, download=True)
             pca_train_dataset, pca_test_dataset = convert_mnist_data(train_dataset, test_dataset, self.qdim,
                                                                      one_hot=self.one_hot)
-            self.pvq_dataset, self.test_dataset, self._qencode_dim = \
+            self.full_dataset, self.test_dataset, self._qencode_dim = \
                 encode_quantum_data(self.qencoder,
                                     train_data=pca_train_dataset,
                                     test_data=pca_test_dataset,
                                     processing_batch_size=self.qnode_batch_size)
-            val_len = int(len(self.pvq_dataset) / 10)
-            self.train_dataset, self.val_dataset = random_split(self.pvq_dataset,
-                                                                [len(self.pvq_dataset) - val_len, val_len])
+            val_len = int(len(self.full_dataset) / 10)
+            self.train_dataset, self.val_dataset = random_split(self.full_dataset,
+                                                                [len(self.full_dataset) - val_len, val_len])
 
     def train_dataloader(self):
         return DataLoader(self.train_dataset, batch_size=self.train_batch_size, shuffle=True)
