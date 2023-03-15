@@ -1,14 +1,35 @@
 seed_everything: 42
 n_qubits: 8
 qdim: 256
-locality: 3
 kfold: 5
+observables:
+  class_path: pvqa.observables.LocalPauliObservables
+  init_args:
+    locality: 3
 qencoder:
-  class_path: pvqa.qencoder.ShadowBottomUpEncoder
+  class_path: pvqa.qencoder.ShadowTopDownEncoder
   init_args:
     embedding: AmplitudeEmbedding
     embedding_kwargs:
       normalize: true
+    ansatz: IdentityOriginStronglyEntanglingLayer
+    derivative_order: 1
+data:
+  class_path: pvqa.datamodule.TorchVisionDataModule
+  init_args:
+    dataset_name: MNIST
+    qnode_batch_size: 2
+    train_batch_size: 32
+    samples: 1000
+    binary: true
+model:
+  class_path: pvqa.model.SimpleClassifier
+  init_args:
+    labels: 2
+optimizer:
+  class_path: torch.optim.AdamW
+  init_args:
+    lr: 1e-3
 trainer:
   max_epochs: 50
   callbacks:
@@ -17,18 +38,3 @@ trainer:
         monitor: val_f1_score
         mode: max
         every_n_epochs: 1
-model:
-  class_path: pvqa.model.SimpleClassifier
-  init_args:
-    labels: [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
-data:
-  class_path: pvqa.datamodule.TorchVisionDataModule
-  init_args:
-    dataset_name: MNIST
-    one_hot: true
-    qnode_batch_size: 128
-    train_batch_size: 128
-optimizer:
-  class_path: torch.optim.AdamW
-  init_args:
-    lr: 1e-3

@@ -23,8 +23,8 @@ class ShadowTopDownEncoder(TaylorEncoder, ShadowEncoder):
     def _generate_models(self):
         models = {}
         for idx, observable in enumerate(self.random_measurement_basis):
-            models[(idx, observable)] = []
-            model_set = models[(idx, observable)]
+            models[idx] = []
+            model_set = models[idx]
             model_set.append(qml.QNode(partial(self.qnode, observable=observable), self.device,
                                        diff_method="parameter-shift", max_diff=self.derivative_order))
             for i in range(self.derivative_order):
@@ -36,10 +36,10 @@ class ShadowTopDownEncoder(TaylorEncoder, ShadowEncoder):
         self.ansatz(weights=weights, wires=range(self.n_qubits), **self.ansatz_kwargs)
         return qml.probs(op=observable)
 
-    def __call__(self, features, weights):
+    def __call__(self, features):
         probs = []
-        for (_, observable), models in self.models.items():
-            group_results = [model(features, weights).reshape([features.shape[0], 2 ** self.n_qubits, -1])
+        for _, models in self.models.items():
+            group_results = [model(features, self.init_weight).reshape([features.shape[0], 2 ** self.n_qubits, -1])
                              for model in models]
             group_results = np.concatenate(group_results, axis=-1)  # B x 2^N x D
             group_results = group_results.transpose((2, 0, 1))  # D x B x 2^N

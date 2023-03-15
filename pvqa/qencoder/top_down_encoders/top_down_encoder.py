@@ -10,11 +10,10 @@ from pvqa.qencoder.interfaces import TaylorEncoder
 
 class TopDownEncoder(TaylorEncoder):
     def __init__(self, n_qubits: int, observable_list: Iterable[qml.operation.Observable], derivative_order: int,
-                 embedding: str, ansatz: str, init_weight: Union[np.array, qml.numpy.tensor],
-                 embedding_kwargs: Optional[dict] = None, ansatz_kwargs: Optional[dict] = None,
+                 embedding: str, ansatz: str, embedding_kwargs: Optional[dict] = None, ansatz_kwargs: Optional[dict] = None,
                  device: str = "default.qubit", shots: Optional[int] = None):
         super(TopDownEncoder, self).__init__(n_qubits, observable_list, derivative_order, embedding, ansatz,
-                                             init_weight, embedding_kwargs, ansatz_kwargs, device, shots)
+                                             embedding_kwargs, ansatz_kwargs, device, shots)
         self.grouped_observables = group_observables(self.observable_list)
         self.models = self._generate_models()
 

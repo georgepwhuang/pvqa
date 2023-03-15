@@ -7,21 +7,19 @@ from typing import Optional
 from functools import partial
 
 from pvqa.constants import CONFIG_DIR, LOG_DIR
+from pvqa.observables.base import IterObservables
 from pvqa.qencoder.interfaces import QEncoder
-from pvqa.util import LocalPauliObservables
 from pvqa.util.kfold import KFoldLoop, setup_folds, setup_fold_index
 
 
 class PVQACLI(LightningCLI):
     def add_arguments_to_parser(self, parser):
         parser.add_subclass_arguments(QEncoder, "qencoder")
-        parser.add_class_arguments(LocalPauliObservables, "observables")
+        parser.add_subclass_arguments(IterObservables, "observables")
         parser.add_argument("n_qubits", type=int)
         parser.add_argument("qdim", type=int)
-        parser.add_argument("locality", type=int)
         parser.add_argument("kfold", type=Optional[int], default=None)
-        parser.link_arguments("n_qubits", "observables.qubits")
-        parser.link_arguments("locality", "observables.locality")
+        parser.link_arguments("n_qubits", "observables.init_args.qubits")
         parser.link_arguments("qdim", "data.init_args.qdim")
         parser.link_arguments("n_qubits", "qencoder.init_args.n_qubits")
         parser.link_arguments("observables", "qencoder.init_args.observable_list", apply_on="instantiate")
@@ -33,7 +31,6 @@ class PVQACLI(LightningCLI):
     def instantiate_classes(self) -> None:
         super().instantiate_classes()
         folds = self._get(self.config, "kfold")
-        print(folds)
         if folds is not None:
             self.datamodule.setup_folds = partial(setup_folds, self.datamodule)
             self.datamodule.setup_fold_index = partial(setup_fold_index, self.datamodule)

@@ -1,2 +1,2 @@
-from pvqa.preprocess.encode_data import *
-from pvqa.preprocess.mnist_processing import *
+from pvqa.preprocess.encode_data import encode_quantum_data
+from pvqa.preprocess.mnist_processing import convert_mnist_data
