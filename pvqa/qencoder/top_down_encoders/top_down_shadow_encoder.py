@@ -2,7 +2,7 @@ import warnings
 from functools import partial
 from typing import Iterable, Optional
 
-import numpy as np
+from pennylane import numpy as np
 import pennylane as qml
 
 from pvqa.qencoder.interfaces import ShadowEncoder, TaylorEncoder

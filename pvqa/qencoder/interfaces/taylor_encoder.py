@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Iterable, Optional, Union
 
-import numpy as np
+from pennylane import numpy as np
 import pennylane as qml
 import pvqa.ansatz
 

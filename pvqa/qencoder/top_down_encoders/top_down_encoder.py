@@ -1,7 +1,7 @@
 from functools import partial
 from typing import Iterable, Optional, Union
 
-import numpy as np
+from pennylane import numpy as np
 import pennylane as qml
 from pennylane.pauli import group_observables
 

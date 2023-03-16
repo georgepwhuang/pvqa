@@ -1,9 +1,9 @@
-import numpy as np
+from pennylane import numpy as np
 import pennylane as qml
 
 from pvqa.ansatz.base import Ansatz
 
-class IdentityOriginStronglyEntanglingLayer(Ansatz):
+class IdentityOriginStronglyEntanglingLayers(Ansatz):
     def __init__(self, layers, n_qubits):
         self.layers = layers
         self._weights = np.zeros([2 * layers, n_qubits, 3])

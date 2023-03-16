@@ -1,6 +1,6 @@
 from typing import Optional, Tuple, Union
 
-import numpy as np
+from pennylane import numpy as np
 import pytorch_lightning as pl
 import torchvision.datasets
 from torch.utils.data import random_split, DataLoader

@@ -3,6 +3,7 @@ from typing import Optional
 import torch
 from torch.utils.data import Dataset, DataLoader, TensorDataset
 from tqdm.rich import tqdm
+from pennylane import numpy as np
 
 from pvqa.qencoder.interfaces import QEncoder
 
@@ -15,7 +16,7 @@ def encode_quantum_data(encoder: QEncoder,
     inputs = []
     labels = []
     for x, y in tqdm(iter(train_dataloader), desc="Converting Training Data to Post Variational Quantum Embeddings"):
-        x_mod = encoder(x)
+        x_mod = encoder(np.tensor(x))
         inputs.append(torch.tensor(x_mod).float())
         labels.append(y.long())
     inputs = torch.cat(inputs)
@@ -26,7 +27,7 @@ def encode_quantum_data(encoder: QEncoder,
         test_inputs = []
         test_labels = []
         for x, y in tqdm(iter(test_dataloader), desc="Converting Testing Data to Post Variational Quantum Embeddings"):
-            x_mod = encoder(x)
+            x_mod = encoder(np.tensor(x))
             test_inputs.append(torch.tensor(x_mod).float())
             test_labels.append(y.long())
         test_inputs = torch.cat(test_inputs)

@@ -7,12 +7,12 @@ observables:
   init_args:
     locality: 3
 qencoder:
-  class_path: pvqa.qencoder.ShadowTopDownEncoder
+  class_path: pvqa.qencoder.TopDownEncoder
   init_args:
     embedding: AmplitudeEmbedding
     embedding_kwargs:
       normalize: true
-    ansatz: IdentityOriginStronglyEntanglingLayer
+    ansatz: StronglyEntanglingLayers
     derivative_order: 1
 data:
   class_path: pvqa.datamodule.TorchVisionDataModule

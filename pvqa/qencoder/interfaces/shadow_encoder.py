@@ -1,7 +1,7 @@
 from abc import ABC
 from typing import Iterable, Optional
 
-import numpy as np
+from pennylane import numpy as np
 import pennylane as qml
 from pennylane.pauli import pauli_word_to_string, string_to_pauli_word, group_observables
 
