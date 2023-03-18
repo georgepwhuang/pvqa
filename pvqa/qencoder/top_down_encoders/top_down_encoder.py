@@ -23,7 +23,7 @@ class TopDownEncoder(TaylorEncoder):
             models[tuple(observable_group)] = []
             model_set = models[tuple(observable_group)]
             model_set.append(qml.QNode(partial(self.qnode, observables=observable_group), self.device,
-                                       diff_method="parameter-shift", max_diff=self.derivative_order))
+                                       max_diff=self.derivative_order))
             for i in range(self.derivative_order):
                 model_set.append(qml.jacobian(model_set[i], argnum=1))
         return models

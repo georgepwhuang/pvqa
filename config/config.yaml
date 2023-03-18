@@ -12,13 +12,13 @@ qencoder:
     embedding: AmplitudeEmbedding
     embedding_kwargs:
       normalize: true
-    ansatz: StronglyEntanglingLayers
+    ansatz: IdentityOriginStronglyEntanglingLayers
     derivative_order: 1
 data:
   class_path: pvqa.datamodule.TorchVisionDataModule
   init_args:
     dataset_name: MNIST
-    qnode_batch_size: 2
+    qnode_batch_size: 4
     train_batch_size: 32
     samples: 1000
     binary: true
