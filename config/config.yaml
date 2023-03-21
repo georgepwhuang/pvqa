@@ -7,20 +7,18 @@ observables:
   init_args:
     locality: 3
 qencoder:
-  class_path: pvqa.qencoder.TopDownEncoder
+  class_path: pvqa.qencoder.BottomUpEncoder
   init_args:
     embedding: AmplitudeEmbedding
     embedding_kwargs:
       normalize: true
-    ansatz: IdentityOriginStronglyEntanglingLayers
-    derivative_order: 1
 data:
   class_path: pvqa.datamodule.TorchVisionDataModule
   init_args:
     dataset_name: MNIST
-    qnode_batch_size: 4
+    qnode_batch_size: 16
     train_batch_size: 32
-    samples: 1000
+    samples: 2000
     binary: true
 model:
   class_path: pvqa.model.SimpleClassifier
@@ -31,7 +29,7 @@ optimizer:
   init_args:
     lr: 1e-3
 trainer:
-  max_epochs: 50
+  max_epochs: 150
   callbacks:
     - class_path: pytorch_lightning.callbacks.ModelCheckpoint
       init_args:

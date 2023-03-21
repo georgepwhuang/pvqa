@@ -10,7 +10,7 @@ from pvqa.qencoder.interfaces.qencoder import QEncoder
 
 class ShadowEncoder(QEncoder, ABC):
     def __init__(self, n_qubits: int, observable_list: Iterable[qml.operation.Observable], embedding: str,
-                 embedding_kwargs: Optional[dict], device: str, shots: Optional[int], strategy: str,
+                 embedding_kwargs: Optional[dict], device: str, shots: int, strategy: str,
                  seed: Optional[int], *args, **kwargs):
         super(ShadowEncoder, self).__init__(n_qubits, observable_list, embedding, embedding_kwargs, device, shots,
                                             *args, **kwargs)
@@ -18,21 +18,18 @@ class ShadowEncoder(QEncoder, ABC):
 
         self.observable_tensor = self.__generate_observables()
 
+        self.device = qml.device(device, wires=self.n_qubits, shots=1)
         if self.shots is None:
             assert strategy == "qwc"
             self.recipe, self.random_measurement_basis = self.__qwc_generate_shadow_measurements()
             self.device = qml.device(device, wires=self.n_qubits)
         else:
+            self.device = qml.device(device, wires=self.n_qubits, shots=1)
             if strategy == "random":
-                self.device = qml.device(device, wires=self.n_qubits, shots=1)
                 self.recipe, self.random_measurement_basis = self.__random_generate_shadow_measurements()
             elif strategy == "qwc":
                 self.recipe, self.random_measurement_basis = self.__qwc_generate_shadow_measurements()
-                self.device = qml.device(device, wires=self.n_qubits, shots=shots // len(self.random_measurement_basis))
-                self.shots = (shots // len(self.random_measurement_basis)) * len(self.random_measurement_basis)
-
-        self.estimation, self.hitmask = self.__generate_estimatation_and_hitmask()
-
+            
     def __generate_observables(self):
         obs_list = []
         for observable in self.observable_list:
@@ -63,9 +60,13 @@ class ShadowEncoder(QEncoder, ABC):
                     pauli_char[i] = np.random.choice(["X", "Y", "Z"])
             unitary_ids.append([ord(idx) - ord('X') for idx in pauli_char])
             unitaries.append(string_to_pauli_word("".join(pauli_char)))
+        if self.shots is not None:
+            l = len(unitary_ids)
+            unitary_ids = unitary_ids * (self.shots // l) + unitary_ids[: self.shots % l]
+            unitaries = unitaries * (self.shots // l) + unitaries[: self.shots % l]
         return np.array(unitary_ids), unitaries
 
-    def __generate_estimatation_and_hitmask(self):
+    def _generate_estimatation_and_hitmask(self):
         indexes = np.expand_dims(np.arange(0, 2 ** self.n_qubits), -1)  # 2^N x 1
         binary_mask = 2 ** np.arange(self.n_qubits - 1, -1, -1)  # N
         bits = np.bitwise_and(indexes, binary_mask) != 0  # 2^N x N

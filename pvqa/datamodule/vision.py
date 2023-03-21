@@ -75,4 +75,4 @@ class TorchVisionDataModule(pl.LightningDataModule):
 
     @property
     def qencode_dim(self):
-        return self._qencode_dim
+        return int(self._qencode_dim)

@@ -9,5 +9,5 @@ class ActivatedClassifier(BaseClassifier):
     def __init__(self, input_dim: int, labels: Union[List[Union[str, int]], int], multilabel: bool = False):
         super().__init__(input_dim, labels, multilabel)
         self.model = nn.Sequential(
-            nn.ReLU(),
+            nn.Tanh(),
             nn.Linear(self.input_dim, self.num_classes))

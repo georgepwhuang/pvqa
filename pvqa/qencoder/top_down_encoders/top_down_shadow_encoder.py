@@ -4,6 +4,7 @@ from typing import Iterable, Optional
 
 from pennylane import numpy as np
 import pennylane as qml
+from pvqa.observables.local_observables import LocalPauliObservables
 
 from pvqa.qencoder.interfaces import ShadowEncoder, TaylorEncoder
 
@@ -19,6 +20,7 @@ class ShadowTopDownEncoder(TaylorEncoder, ShadowEncoder):
                                                    ansatz_kwargs=ansatz_kwargs, device=device, shots=shots,
                                                    seed=seed, strategy=strategy)
         self.models = self._generate_models()
+        self.estimation, self.hitmask = self._generate_estimatation_and_hitmask()
 
     def _generate_models(self):
         models = {}
@@ -53,3 +55,8 @@ class ShadowTopDownEncoder(TaylorEncoder, ShadowEncoder):
         result = np.nan_to_num(result, nan=1.0)
         result = result.reshape((features.shape[0], -1))
         return result
+    
+if __name__ == "__main__":  
+    model = ShadowTopDownEncoder(2, LocalPauliObservables(2,1), embedding="AngleEmbedding", ansatz="StronglyEntanglingLayers", derivative_order=1, shots=10)
+    output = model(np.tensor([[1, 2], [4, 3]]))
+    print(output.shape)
